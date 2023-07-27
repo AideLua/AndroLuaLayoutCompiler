@@ -1,0 +1,11 @@
+appname="编译布局"
+appver="1.1"
+appcode="1199"
+packagename="com.jesse205.compilelayout"
+mode="plugin"
+debugmode=true
+user_permission={
+  "WRITE_EXTERNAL_STORAGE",
+  "MANAGE_EXTERNAL_STORAGE",
+  "READ_EXTERNAL_STORAGE"
+}
