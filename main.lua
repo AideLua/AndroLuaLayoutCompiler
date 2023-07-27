@@ -11,6 +11,9 @@ import "java.io.FileInputStream"
 import "java.io.FileOutputStream"
 import "android.content.Context"
 import "android.text.Html"
+import "java.util.Locale"
+
+import "com.onegravity.rteditor.RTEditorMovementMethod"
 
 import "utils.DialogHelper"
 import "utils.FileUtil"
@@ -20,6 +23,8 @@ import "helper"
 import "compilelayout"
 import "init"
 import "LayoutHelper"
+import "layoutTemplate"
+import 'lua.i18n'
 
 EXPORT_HELPER=1
 PICK_ALY=2
@@ -29,6 +34,8 @@ TYPES_LUA=String({"application/octet-stream","application/lua","text/plain"})
 
 EXTRA_PRJ_PATH="prjPath"
 EXTRA_FILE_PATH="filePath"
+
+URL_REPOSITORY="https://gitee.com/AideLua/AndroLuaLayoutCompiler"
 
 --禁用华为主题
 --androidhwext=nil
@@ -54,14 +61,20 @@ local intent=activity.getIntent()
 initPrjPath=intent.getStringExtra(EXTRA_FILE_PATH) or initPrjPath
 initFilePath=intent.getStringExtra(EXTRA_FILE_PATH) or initFilePath
 
-initPrjPath=initPrjPath or "/storage/emulated/0/AppProjects/AideLuaPro"
-initFilePath=initFilePath or "/storage/emulated/0/AppProjects/AideLuaPro/app/src/main/assets_bin/layouts/buildingLayout.aly"
+--initPrjPath=initPrjPath or "/storage/emulated/0/AppProjects/AideLuaPro"
+--initFilePath=initFilePath or "/storage/emulated/0/AppProjects/AideLuaPro/app/src/main/assets_bin/layouts/buildingLayout.aly"
 parentFilePath=initFilePath and FileUtil.getParent(initFilePath) or initPrjPath
 
 initShortPath=initFilePath and shortPath(initFilePath,initPrjPath)
 --initOutputPath=initShortPath and initShortPath:gsub("%.aly$",".lua")
 initEnvironmentPath=buildEnvPath(parentFilePath)
 
+i18n.loadFile(luajava.luadir..'/i18n/en.lua')
+i18n.loadFile(luajava.luadir..'/i18n/zh.lua')
+
+i18n.setLocale(Locale.getDefault().getLanguage())
+
+activity.setTitle(i18n("appName"))
 actionBar.setDisplayHomeAsUpEnabled(true)
 actionBar.setSubtitle(string.format("v%s (%s)",appver,appcode))
 activity.setContentView(loadlayout("layout"))
@@ -73,13 +86,31 @@ if Build.VERSION.SDK_INT>=25 then
   messageView.setRevealOnFocusHint(false)
 end
 
-messageView.setText(Html.fromHtml(decodeTemplateCode(readFile(luajava.luadir.."/message.html"))))
+messageView.setText(Html.fromHtml(decodeTemplateCode(readFile(rel2AbsPath(i18n("messagePath"),luajava.luadir)))))
+
+function onCreateOptionsMenu(menu)
+  menu.add(0,1,0,i18n("sourceRepository"))
+  menu.add(0,2,0,i18n("openSourceLicenses"))
+end
 
 function onOptionsItemSelected(item)
   local id=item.getItemId()
   local title=item.title
   if id==android.R.id.home then
     activity.finish()
+   elseif id==1 then
+    local intent = Intent("android.intent.action.VIEW",Uri.parse(URL_REPOSITORY))
+    activity.startActivity(intent)
+   elseif id==2 then
+    local dialog=AlertDialog.Builder(this)
+    .setTitle(i18n("openSourceLicenses"))
+    .setMessage(Html.fromHtml(readFile(luajava.luadir.."/openSourceLicenses.html")))
+    .setPositiveButton(android.R.string.ok,nil)
+    .show()
+    local messageView=dialog.findViewById(android.R.id.message)
+    messageView.setTextIsSelectable(true)
+    messageView.setMovementMethod(RTEditorMovementMethod.getInstance())
+
   end
 end
 
@@ -106,22 +137,17 @@ end
 function compileFunc(importText,envPath,prjPath,alyPath)
   return pcall(function()
     require "import"
-    import "android.net.Uri"
-    import "android.os.Environment"
-    import "java.io.FileInputStream"
-    import "java.io.FileOutputStream"
+    --import "android.net.Uri"
+    --import "android.os.Environment"
+    --import "java.io.FileInputStream"
+    --import "java.io.FileOutputStream"
     for line in (importText.."\n"):gmatch("(.-)\n") do
       if line~="" then
         _G["import"](line)
       end
     end
     import "compilelayout"
-    local filePath
-
-    if not alyPath:find("^/") then--相对路径
-      filePath=prjPath.."/"..alyPath
-    end
-    return compilelayout(filePath,envPath)
+    return compilelayout(alyPath,envPath)
   end)
 end
 
@@ -136,7 +162,7 @@ function compileCallback(success,content)
     .setPositiveButton(android.R.string.ok,nil)
     dialog=builder.show()
     editor.format()
-    editor.setScrollIndicators( View.SCROLL_INDICATOR_TOP | View.SCROLL_INDICATOR_BOTTOM,
+    editor.setScrollIndicators(View.SCROLL_INDICATOR_TOP | View.SCROLL_INDICATOR_BOTTOM,
     View.SCROLL_INDICATOR_TOP | View.SCROLL_INDICATOR_BOTTOM)
    else
     builder.setTitle("编译错误")
@@ -155,9 +181,9 @@ exportHelperButton.onClick=function()
   intent.putExtra(Intent.EXTRA_TITLE, "LayoutHelper.lua")
   local prjPath=prjPathEdit.text
   local parentFilePath=FileUtil.getParent(getAlyPath())
-  if parentFilePath~="" and parentFilePath:sub(1,#sdcardPath)==sdcardPath then
+  if parentFilePath and parentFilePath~="" and parentFilePath:sub(1,#sdcardPath)==sdcardPath then
     intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, FileUriUtil.path2DocumentUri(parentFilePath,false))
-   elseif prjPath and prjPath:sub(1,#sdcardPath)==sdcardPath then
+   elseif prjPath and prjPath~="" and prjPath:sub(1,#sdcardPath)==sdcardPath then
     intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, FileUriUtil.path2DocumentUri(prjPath,false))
   end
   activity.startActivityForResult(intent,EXPORT_HELPER)
@@ -165,8 +191,16 @@ end
 
 
 compileButton.onClick=function()
+  local err=false
+  if not File(getAlyPath()).isFile() then
+    err=true
+    alyPathEdit.setError(i18n("error.fileNotFound"))
+  end
+  if err then
+    return
+  end
   activity.newTask(compileFunc,compileCallback)
-  .execute({importEdit.text, pathEdit.text, prjPathEdit.text, alyPathEdit.text})
+  .execute({importEdit.text, pathEdit.text, getPrjPath(), getAlyPath()})
 end
 
 alyPathSelectButton.onClick=function()
@@ -176,7 +210,7 @@ alyPathSelectButton.onClick=function()
   intent.putExtra(Intent.EXTRA_MIME_TYPES,TYPES_LUA)
   local parentFilePath=FileUtil.getParent(getAlyPath())
 
-  if parentFilePath and parentFilePath:sub(1,#sdcardPath)==sdcardPath then
+  if parentFilePath and parentFilePath~="" and parentFilePath:sub(1,#sdcardPath)==sdcardPath then
     intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, FileUriUtil.path2DocumentUri(parentFilePath,false))
     --[[
    elseif prjPath and String(prjPath).startsWith(sdcardPath) then--工程目录在SD卡目录下
@@ -188,7 +222,7 @@ end
 prjPathSelectButton.onClick=function()
   local intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
   local previousPrjPath=prjPathEdit.text
-  if previousPrjPath and String(previousPrjPath).startsWith(sdcardPath) then
+  if previousPrjPath and previousPrjPath~="" and previousPrjPath:sub(1,#sdcardPath)==sdcardPath then
     intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, FileUriUtil.path2DocumentUri(previousPrjPath,false))
   end
   activity.startActivityForResult(intent,PICK_PRJ)

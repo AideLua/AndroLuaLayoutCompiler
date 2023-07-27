@@ -1,6 +1,6 @@
 appname="编译布局"
-appver="1.1"
-appcode="1199"
+appver="1.3(alpha)"
+appcode="1301"
 packagename="com.jesse205.compilelayout"
 mode="plugin"
 debugmode=true

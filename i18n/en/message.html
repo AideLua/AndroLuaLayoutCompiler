@@ -1,0 +1,43 @@
+<html>
+    <head></head>
+    <body>
+        Welcome to the Layout Compiler! 
+        <ul>
+            <li>Developer: jesse205</li>
+            <li>Compiler version: {{compilelayout.__VERSION}}</li>
+            <li>LayoutHelper version: {{LayoutHelper._VERSION}}</li>
+        </ul>
+        <h2>How to use</h2>
+        <ol>
+            <li>Fill in the information into the edit box above</li>
+            <li>Generate a PATH</li>
+            <li>Click "Export LayoutHelper" to export "LayoutHelper.lua" to the "Project/lua" directory. AideLua is "Project/Module/Type/src/luaLibs").</li>
+            <li>Click the "Compile Layout" button and select the save path.</li>
+        </ol>
+        <h2>Notice</h2>
+        <ol>
+            <li>Must import `android.widget.AdapterView`, otherwise the inheritance relationship cannot be determined.</li>
+            <li>Must fill in the PATH, otherwise the sublayout file cannot be found.</li>
+            <li>This program is not adapted to SAF framework because it needs to load files dynamically, so please make sure to give storage permission, otherwise the software will not work.</li>
+        </ol>
+        <h2>Known Bugs</h2>
+        <ul>
+            <li>Unable to use relative layouts</li>
+            <li>.9 image not working</li>
+        </ul>
+        <h2>Open API</h2>
+        <div>
+            Activity: {{activity.packageName}}/{{activity.class.getName()}}
+        </div>
+        <h3>Lua Parameters</h3>
+        <ul>
+            <li>[1] prjPath(string): project path</li>
+            <li>[2] filePath(string): file path</li>
+        </ul>
+        <h3>Intent Additional Parameters</h3>
+        <ul>
+            <li>prjPath(string): Project Path</li>
+            <li>filePath(string): File Path</li>
+        </ul>
+    </body>
+</html>
