@@ -674,8 +674,8 @@ function compilelayout(t,groupClass,level,varNameProvider,paths)
        elseif k=="id" then --创建view的全局变量
         compiledContent=compiledContent..([[
 rawset(root,%s,%s)
-%s.setId(LayoutHelper.newId())
-]]):format(obj2code(v),varNameProvider.view,varNameProvider.view)
+%s.setId(LayoutHelper.newId(%s))
+]]):format(obj2code(v),varNameProvider.view,varNameProvider.view,obj2code(v))
 
        else
         local e,s=pcall(setattributeCode,view,k,v,varNameProvider,level,paths,hasAdapter)
@@ -708,7 +708,7 @@ return function(root,group)
   local varsMap={}
   root=root or _G
   ]]..content..([[
-  varsMap=nil
+  --varsMap=nil
   return %s
 end]]):format(varNameProvider.view)
 end

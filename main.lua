@@ -192,6 +192,7 @@ end
 
 compileButton.onClick=function()
   local err=false
+  --compilelayout(getAlyPath(),pathEdit.text)
   if not File(getAlyPath()).isFile() then
     err=true
     alyPathEdit.setError(i18n("error.fileNotFound"))

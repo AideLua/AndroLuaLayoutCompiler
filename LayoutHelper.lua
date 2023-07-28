@@ -22,8 +22,9 @@ LayoutHelper.PERCENT_H=H/100
 
 local dm=context.getResources().getDisplayMetrics()
 LayoutHelper.dm=dm
-LayoutHelper.id=0x7f000000
-LayoutHelper.ids={}
+--LayoutHelper.id=0x7f000000
+luajava.ids=luajava.ids or {id=0x7f000000}
+local ids=luajava.ids
 LayoutHelper.scaleTypes=ScaleType.values()
 LayoutHelper.ltrs={}
 
@@ -45,9 +46,9 @@ function LayoutHelper.getClickListener(root,v)
   return listener
 end
 
-function LayoutHelper.newId()
-  LayoutHelper.id=LayoutHelper.id+1
-  return LayoutHelper.id
+function LayoutHelper.newId(idName)
+  ids.id=ids.id+1
+  return ids.id
 end
 
 local ver = luajava.bindClass("android.os.Build").VERSION.SDK_INT;
