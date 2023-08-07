@@ -13,10 +13,14 @@ Compile AndroLua+ layout, convert it into Lua code.
   - `lua/compilelayout.lua` Compiler ontology.
   - `lua/VituralG.lua` Virtual`_ G `, used to obtain code calls.
   - `lua/obj2code.lua` Tools for converting objects into code.
+  - `LayoutHelper.lua` layout helper that needs to be imported within the target software to provide some classes.
 - Other files
+  - `lua/i18n/` [i18n.lua](https://github.com/kikito/i18n.lua) for lua.
+  - `lua/themeutil.lua` Theme helper for adaptive target platforms. This is a must-have component for AideLua shared pages.
   - `main.lua` AndroLua+ entry file.
   - `init.lua` AndroLua+ configuration file.
   - `layout.aly` Software layout file.
+  - `i18n/` Internationalization profile.
 
 ## Installation Tutorial
 

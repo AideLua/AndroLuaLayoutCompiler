@@ -10,13 +10,19 @@
 ## 软件架构
 
 - 核心文件
-  - `lua/compilelayout.lua` 编译器本体
+  - `lua/compilelayout.lua` 编译器本体。
   - `lua/VituralG.lua` 虚拟 `_G`，用于获取代码调用。
-  - `lua/obj2code.lua` 将对象转换为代码的工具
+  - `lua/obj2code.lua` 将对象转换为代码的工具。
+  - `LayoutHelper.lua` 布局助手，需要导入到目标软件内，以提供一些类。
 - 其他文件
-  - `main.lua` AndroLua+ 入口文件
-  - `init.lua` AndroLua+ 配置文件
-  - `layout.aly` 软件布局文件
+  - `lua/i18n/` 供 lua 使用的 [i18n.lua](https://github.com/kikito/i18n.lua)
+  - `lua/themeutil.lua` 自适应目标平台的主题助手。这是 AideLua 共享页面必备组件。
+  - `main.lua` AndroLua+ 入口文件。
+  - `init.lua` AndroLua+ 配置文件。
+  - `layout.aly` 软件布局文件。
+  - `helper.lua` 装有一些方法文件。
+  - `layoutTemplate.lua` 布局模板。
+  - `i18n/` 国际化配置文件。
 
 ## 安装教程
 
