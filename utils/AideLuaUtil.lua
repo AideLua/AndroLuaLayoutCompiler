@@ -1,4 +1,4 @@
 local AideLuaUtil={}
 function AideLuaUtil.isAideLuaProject()
-  end
+end
 return AideLuaUtil
