@@ -7,6 +7,52 @@
 ![Android 5.0+](https://img.shields.io/badge/Android-5.0%2B-green?logo=android)
 ![AndroLua+ 5.x](https://img.shields.io/badge/AndroLua%2B-5.x-blue?logo=lua&logoColor=blue)
 
+## 示例
+
+### 源文件
+
+``` lua
+{
+  LinearLayout,
+  orientation="vertical",
+  layout_width="fill",
+  layout_height="fill",
+  {
+    TextView,
+    gravity="center",
+    text="Hello AndroLua+",
+    layout_width="fill",
+    layout_height="fill",
+  },
+}
+```
+
+### 编译后
+
+```lua
+local LayoutHelper=require "LayoutHelper"
+return function(root,group)
+  local varsMap={}
+  root=root or _G
+  varsMap.view0=LinearLayout(activity)
+  varsMap.params0=ViewGroup.LayoutParams(-1,-1)
+  varsMap.params0=group and group.LayoutParams(varsMap.params0) or ViewGroup.LayoutParams(varsMap.params0)
+  varsMap.view1=TextView(activity)
+  varsMap.params1=LinearLayout.LayoutParams(ViewGroup.LayoutParams(-1,-1))
+  varsMap.view1.setText("Hello AndroLua+")
+  varsMap.view1.setGravity(17)
+  varsMap.view1.setLayoutParams(varsMap.params1)
+  --varsMap.params1=nil
+  varsMap.view0.addView(varsMap.view1)
+  --varsMap.view1=nil
+  varsMap.view0.setOrientation(1)
+  varsMap.view0.setLayoutParams(varsMap.params0)
+  --varsMap.params0=nil
+  --varsMap=nil
+  return varsMap.view0
+end
+```
+
 ## 软件架构
 
 - 核心文件
@@ -32,7 +78,7 @@
 ## 使用说明
 
 1. 填入信息到上面的编辑框内
-2. 点击“导出 LayoutHelper”，将 `LayoutHelper.lua` 导出到 `项目/lua` 目录内（AideLua为 `项目/模块/类型/src/luaLibs`）。
+2. 点击“导出 LayoutHelper”，将 `LayoutHelper.lua` 导出到 `项目/lua` 目录内（AideLua 为 `项目/模块/类型/src/luaLibs`）。
 3. 点击“编译布局”按钮，选择保存路径。
 
 ## 参与贡献

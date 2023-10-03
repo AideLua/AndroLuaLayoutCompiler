@@ -7,6 +7,52 @@ Compile AndroLua+ layout, convert it into Lua code.
 ![Android 5.0+](https://img.shields.io/badge/Android-5.0%2B-green?logo=android)
 ![AndroLua+ 5.x](https://img.shields.io/badge/AndroLua%2B-5.x-blue?logo=lua&logoColor=blue)
 
+## Example
+
+### Source
+
+``` lua
+{
+  LinearLayout,
+  orientation="vertical",
+  layout_width="fill",
+  layout_height="fill",
+  {
+    TextView,
+    gravity="center",
+    text="Hello AndroLua+",
+    layout_width="fill",
+    layout_height="fill",
+  },
+}
+```
+
+### After compiling
+
+```lua
+local LayoutHelper=require "LayoutHelper"
+return function(root,group)
+  local varsMap={}
+  root=root or _G
+  varsMap.view0=LinearLayout(activity)
+  varsMap.params0=ViewGroup.LayoutParams(-1,-1)
+  varsMap.params0=group and group.LayoutParams(varsMap.params0) or ViewGroup.LayoutParams(varsMap.params0)
+  varsMap.view1=TextView(activity)
+  varsMap.params1=LinearLayout.LayoutParams(ViewGroup.LayoutParams(-1,-1))
+  varsMap.view1.setText("Hello AndroLua+")
+  varsMap.view1.setGravity(17)
+  varsMap.view1.setLayoutParams(varsMap.params1)
+  --varsMap.params1=nil
+  varsMap.view0.addView(varsMap.view1)
+  --varsMap.view1=nil
+  varsMap.view0.setOrientation(1)
+  varsMap.view0.setLayoutParams(varsMap.params0)
+  --varsMap.params0=nil
+  --varsMap=nil
+  return varsMap.view0
+end
+```
+
 ## Software architecture
 
 - Core documents
